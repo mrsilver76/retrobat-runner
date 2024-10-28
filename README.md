@@ -19,6 +19,9 @@ The script is heavily documented and can be easily modified to suit your prefere
 * If you press the combination correctly, your controller will vibrate (if your controller supports this) and RetroBat will start.
 * Pressing the combination whilst you are running RetroBat will do nothing.
 
+> [!TIP]
+> The script queries the registry (`HKCU\Software\RetroBat\LatestKnownInstallPath`) to automatically work out where RetroBat is installed. If this value does not exist then `C:\RetroBat\` will be assumed.
+
 ## Configuration instructions
 
 To configure the script, open it up in your preferred text editor. I recommend [Notepad++](https://notepad-plus-plus.org/) but Notepad will do. You will also need [AutoHotkey v2](https://www.autohotkey.com/) installed.
@@ -31,7 +34,8 @@ There are a couple of things you can easily configure at the top of the code:
 
 This is the combination of buttons you need to press in order to launch RetroBat. Each button has a number associated with it and a constant which is easier to read and understand (for example, `XINPUT_GAMEPAD_DPAD_DOWN` has the value `0x0002`). You can use either the number or the constant in this line of code. You can find the constants in `XInput.ahk` or at [this Microsoft page](https://learn.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad).
 
-> :warning: Despite the name, `XINPUT_GAMEPAD_BACK` is used for the "select" button.
+> [!TIP]
+> Despite the name, `XINPUT_GAMEPAD_BACK` is used for the "select" button.
 
 You can have as many button combinations as you like however, the more you have, the harder it will be for someone to execute. You shouldn't have the combination too simple, otherwise you run the risk of accidentally triggering it.
 
