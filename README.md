@@ -16,7 +16,7 @@ The script is heavily documented and can be easily modified to suit your prefere
 * Once RetroBat Runner is launched, it will appear in your System Tray with the RetroBat icon.
 * The default launch combination is **SELECT** followed by **START**. It does not matter which controller you use and you can even use different controllers to complete the combination.
 * You must press the **START** button within 1 second of pressing the **SELECT** button. If you do not, then you will need to start the combination from the beginning again.
-* If you press the combination correctly, your controller will vibrate (if your controller supports this) and RetroBat will start.
+* If you press the combination correctly, all controllers will vibrate (if the controller supports this) and RetroBat will start.
 * Pressing the combination whilst you are running RetroBat will do nothing.
 
 > [!TIP]
@@ -30,7 +30,7 @@ Make your changes (the code is documented to help you), save the file and then d
 
 There are a couple of things you can easily configure at the top of the code:
 
-### buttonCombo
+### comboButton
 
 This is the combination of buttons you need to press in order to launch RetroBat. Each button has a number associated with it and a constant which is easier to read and understand (for example, `XINPUT_GAMEPAD_DPAD_DOWN` has the value `0x0002`). You can use either the number or the constant in this line of code. You can find the constants in `XInput.ahk` or at [this Microsoft page](https://learn.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad).
 
@@ -49,9 +49,9 @@ The longer the time, the easier it is for someone to execute the combination but
 
 The default setting is 1000ms, which is 1 second.
 
-### rumbleConfirm
+### confirmRumble
 
-If you want the controller to rumble when you complete the combo, then set this to `1`. You will need a controller that supports rumble. It's worth noting that only the controller that executes the last button press of the combo will rumble.
+If you want all the connected controllers to rumble when you complete the combo, then set this to `1`. This will only work on controllers that have a rumble motor in them.
 
 The default setting is `1` which means rumble is on.
 
