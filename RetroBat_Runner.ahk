@@ -4,7 +4,7 @@
 #Warn
 
 ;
-; RetroBat Runner
+; RetroBat Runner v1.0
 ; Automatically launch RetroBat when a specific button combination is
 ; pressed on any connected controller
 ; https://github.com/silver76/retrobat-runner/
