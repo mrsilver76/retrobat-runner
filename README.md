@@ -7,9 +7,8 @@ The source code is heavily documented and can be easily modified to suit your pr
 
 ## Download
 
-1. Get the latest version from https://github.com/mrsilver76/retrobat-runner/releases.
-2. Decompress the file by double-clicking on the zip file.
-3. Launch the program by double-clicking on the exe file.
+* Get the latest version from [here](https://github.com/mrsilver76/retrobat-runner/releases).
+* If you have no interest in editing the code then you should just pick the file called `RetroBat_Runner.exe`.
 
 ## Running RetroBat Runner
 
