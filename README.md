@@ -71,7 +71,5 @@ Please raise an issue at https://github.com/mrsilver76/retrobat-runner/issues.
 
 ## Version history
 
-### 1.0 (xxth xxxxx 2024)
+### 1.0 (2nd November 2024)
 - Initial release.
-
-
