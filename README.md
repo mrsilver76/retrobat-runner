@@ -75,6 +75,10 @@ The Trail running icon was created by [Freepik - Flaticon](https://www.flaticon.
 
 Please raise an issue at https://github.com/mrsilver76/retrobat-runner/issues.
 
+## Future improvements
+
+Possible future improvements can be found at https://github.com/mrsilver76/retrobat-runner/labels/enhancement. Unless there is significant interest, it's doubtful I'll implement many of them as the program in its current form suits me just fine.
+
 ## Version history
 
 ### 1.0 (2nd November 2024)
