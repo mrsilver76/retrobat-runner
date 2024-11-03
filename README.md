@@ -56,7 +56,14 @@ The default setting is `1` which means rumble is on.
 
 ## Installation instructions
 
-The easiest approach is to store the executable in the start up folder in Windows. To locate this, right-click on the Windows icon, select "Run", type `shell:startup` and press Enter. If you put the executable (or code) in this folder then RetroBat Runner will start whenever that user logs in.
+The easiest approach is to store the executable somewhere on your computer and then place a shortcut to it in the start-up folder.
+
+To locate the start-up folder, right-click on the Windows icon, select "Run", type `shell:startup` and press Enter. If you right-click `RetroBat-Runner.exe` and select "copy", then you can right-click this start-up window and select "Paste shortcut". 
+
+The next time the current user logs into Windows (which will normally be when the computer powers on), RetroBat Runner will automatically start and sit in the System Tray.
+
+> [!WARNING]
+> If you place `RetroBat-Runner.exe` directly into the start-up folder then Windows Defender will consider this a potential virus. This is because Windows Defender does not like programs in the start-up folder that attempt to run other programs (which, in this case, is RetroBat). The best approach is to use a shortcut instead.
 
 The executable uses very little CPU and memory.
 
