@@ -4,7 +4,7 @@
 #Warn
 
 ;
-; RetroBat Runner v1.0
+; RetroBat Runner v1.0.1
 ; Automatically launch RetroBat when a specific button combination is
 ; pressed on any connected controller
 ; https://github.com/silver76/retrobat-runner/
@@ -58,7 +58,8 @@ buttonTimer := 1000
 
 ; confirmRumble
 ; If set to 1, the controller that correctly presses the last button of
-; the combo will rumble. If set to 0, then the controller will not rumble.
+; the combo will rumble and a sound will be played. If set to 0, then
+; there will be no haptic or audio feedback.
 ;
 ; Note: This will not work if the controller doesn't support rumble!
 
@@ -66,7 +67,7 @@ confirmRumble := 1
 
 ; ----- End of configuration --------------------------------------------- 
 
-version :="1.0"
+version :="1.0.1"
 comboPos := 1
 lastButtonPress := 0
 lastButtonPressTimer := 0
@@ -115,7 +116,7 @@ Handle_Button_Press()
 	If (lastButtonPressTimer != 0 && A_TickCount - lastButtonPressTimer > buttonTimer)
 	{
 		Reset_Everything()
-		; Don't return here, carry on handling button press...
+		; Don't return here, carry on handling the button press...
 	}
 
 	; If buttonPress == lastPress then we've not yet taken our
@@ -218,9 +219,12 @@ Combo_Executed()
 	}
 	
 	; If configured, rumble all controllers (where supported)
+	; Try is used to avoid errors being thrown for controllers that
+	; either don't exist or don't support rumble.
 	
 	If (confirmRumble == 1)
 	{
+		SoundPlay("*-1")
 		futureTick := A_TickCount + 250 ; 1/4 of a second in the future
 		while (futureTick > A_TickCount)
 		{
@@ -228,10 +232,19 @@ Combo_Executed()
 			{
 				Try
 				{
-					; Ignore any errors trying to vibrate a controller that
-					; either doesn't exist or doesn't support vibration
 					XInput_SetState(A_Index-1, 65534, 65534)
 				}
+			}
+		}
+		
+		; Turn rumble back off again. This avoids a strange bug where
+		; rumble continues forever.
+		
+		Loop 4
+		{
+			Try
+			{
+				XInput_SetState(A_Index-1, 0, 0)
 			}
 		}
 	}	
@@ -240,28 +253,36 @@ Combo_Executed()
 
 	Try
 	{
-		Run retrobatPath
+		Run(retrobatPath,,"Max")
 	}
 	Catch as e
 	{
 		MsgBox("Unable to launch " retrobatPath "`n`n" e.Message, "RetroBat Runner", 48)
 		Return
 	}
+
+	; Sometimes EmulationStation (ES) doesn't properly activate. When this happens,
+	; you see ES full screen but also the Windows taskbar and controller input isn't
+	; detected. To work around this, we're going to wait for the ES process to start
+	; and then activate it.
 	
-	; Wait for 5 seconds before checking for input again. Within that 5 seconds, check
-	; to see if EmulationStation is running and make sure it's activated
-	
-	activated := 0
-	Loop 5
+	ESPid := ProcessWait("emulationstation.exe", 5)
+	If (ESPid)
 	{
-		Sleep(1000)
-		If (activated == 0 && WinExist("ahk_class SDL_app"))
+		; ES is running. Try 50 times to activate the ES screen, pausing 100ms each time.
+		Loop 50
 		{
-			activated := 1
-			WinActivate
-		}
+			Try
+			{
+				WinActivate("ahk_pid " . ESPid)
+				break
+			}
+			Sleep 100
+		}	
 	}
 	
+	; Wait for 5 seconds before accepting any input again
+	Sleep(5 * 1000)	
 }
 
 ; About
