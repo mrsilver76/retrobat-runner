@@ -4,7 +4,7 @@
 #Warn
 
 ;
-; RetroBat Runner v1.0
+; RetroBat Runner v1.0.1 (1st December 2024)
 ; Automatically launch RetroBat when a specific button combination is
 ; pressed on any connected controller
 ; https://github.com/silver76/retrobat-runner/
@@ -58,7 +58,8 @@ buttonTimer := 1000
 
 ; confirmRumble
 ; If set to 1, the controller that correctly presses the last button of
-; the combo will rumble. If set to 0, then the controller will not rumble.
+; the combo will rumble and a sound will be played. If set to 0, then
+; there will be no haptic or audio feedback.
 ;
 ; Note: This will not work if the controller doesn't support rumble!
 
@@ -66,7 +67,7 @@ confirmRumble := 1
 
 ; ----- End of configuration --------------------------------------------- 
 
-version :="1.0"
+version := "1.0.1"
 comboPos := 1
 lastButtonPress := 0
 lastButtonPressTimer := 0
@@ -115,7 +116,7 @@ Handle_Button_Press()
 	If (lastButtonPressTimer != 0 && A_TickCount - lastButtonPressTimer > buttonTimer)
 	{
 		Reset_Everything()
-		; Don't return here, carry on handling button press...
+		; Don't return here, carry on handling the button press...
 	}
 
 	; If buttonPress == lastPress then we've not yet taken our
@@ -172,8 +173,9 @@ Reset_Everything()
 Initialise()
 {
 	Global
+
 	; Get the path from the registry
-	global retrobatPath := RegRead("HKEY_CURRENT_USER\Software\RetroBat", "LatestKnownInstallPath", "")
+	Global retrobatPath := RegRead("HKEY_CURRENT_USER\Software\RetroBat", "LatestKnownInstallPath", "")
 	if (!retrobatPath)
 	{
 		; No registry key, so assume the default install location
@@ -209,6 +211,7 @@ Initialise()
 Combo_Executed()
 {
 	Global
+	
 	; If EmulationStation is already running then we shouldn't
 	; do anything
 	PID := ProcessExist("emulationstation.exe")	
@@ -218,9 +221,12 @@ Combo_Executed()
 	}
 	
 	; If configured, rumble all controllers (where supported)
+	; Try is used to avoid errors being thrown for controllers that
+	; either don't exist or don't support rumble.
 	
 	If (confirmRumble == 1)
 	{
+		SoundPlay("*-1")
 		futureTick := A_TickCount + 250 ; 1/4 of a second in the future
 		while (futureTick > A_TickCount)
 		{
@@ -228,40 +234,94 @@ Combo_Executed()
 			{
 				Try
 				{
-					; Ignore any errors trying to vibrate a controller that
-					; either doesn't exist or doesn't support vibration
 					XInput_SetState(A_Index-1, 65534, 65534)
 				}
 			}
 		}
+		
+		; Turn rumble back off again. This avoids a strange bug where
+		; rumble continues forever.
+		
+		Loop 4
+		{
+			Try
+			{
+				XInput_SetState(A_Index-1, 0, 0)
+			}
+		}
 	}	
 
-	; Now launch RetroBat
+	; Now we need to launch RetroBat ... but ... there is a problem.
+	;
+	; Sometimes EmulationStation (ES) doesn't properly activate. When this happens,
+	; you see ES almost full screen, but the Windows taskbar is visible (and maybe the odd
+	; window) and controller input isn't detected. 
+	;
+	; The obvious solution is to wait until ES starts and then just do:
+	;
+	;     WinActivate "ahk_class SDL_app"
+	; 
+	; but that causes a new problem - as when you launch a game from ES
+	; that uses RetroArch, RetroArch runs behind ES and you cannot control it. Even
+	; swapping out ahk_class to ahk_id doesn't work.
+	;
+	; This workaround mimics pretty much what someone sitting at their computer
+	; would do - which is to launch ES, wait until it appears and then click on it
+	; to bring it to the foreground.
+	;
+	; Firstly we need to minimise everything on the desktop and ensure
+	; that no window is active (by making the desktop active). This is so that
+	; when we position the pointer later on, it's not on top of any windows.
+	
+	SendInput "#m"
+	WinActivate "ahk_class Progman"
+	WinWaitActive "ahk_class Progman"
+
+	; Now we launch RetroBat
 
 	Try
 	{
-		Run retrobatPath
+		Run(retrobatPath,,"Max")
 	}
 	Catch as e
 	{
 		MsgBox("Unable to launch " retrobatPath "`n`n" e.Message, "RetroBat Runner", 48)
 		Return
 	}
+
+	; Now we wait until ES is running and then we move the mouse cursor to the centre of
+	; the screen and wait for ES to be detected under the mouse cursor (using `MouseGetPos`).
+	; Once we have this, we'll simulate a left mouse click.
 	
-	; Wait for 5 seconds before checking for input again. Within that 5 seconds, check
-	; to see if EmulationStation is running and make sure it's activated
-	
-	activated := 0
-	Loop 5
+	ESPid := ProcessWait("emulationstation.exe", 5)
+	If (ESPid)
 	{
-		Sleep(1000)
-		If (activated == 0 && WinExist("ahk_class SDL_app"))
+		; ES is running. Move the mouse to the centre of the screen.
+		CoordMode "Mouse", "Screen"
+		MouseMove A_ScreenWidth/2, A_ScreenHeight/2
+		
+		; Now loop 50 times, waiting until the PID under the mouse matches that of ES
+		Loop 50
 		{
-			activated := 1
-			WinActivate
+			MousePID := -1
+			Try
+			{
+				MouseGetPos ,,&ahkid
+				MousePid := WinGetPID(ahkid)  ; Convert ahk_id to pid
+			}
+			; If the mouse pid is the ES pid, then we know that ES is running under
+			; the mouse pointer ... so send a left-click.
+			If (MousePid == ESPid)
+			{
+				MouseClick "left"
+				Break
+			}
+			Sleep 100
 		}
 	}
-	
+
+	; Wait for 5 seconds before accepting any input again
+	Sleep(5 * 1000)	
 }
 
 ; About
