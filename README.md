@@ -89,7 +89,7 @@ Possible future improvements can be found at https://github.com/mrsilver76/retro
 
 ## Version history
 
-### 1.0.1 (25 November 2024)
+### 1.0.1 (1st December 2024)
 - Implemented workaround to resolve an issue where EmulationStation isn't the active window after starting up
 - Implemented workaround to resolve a strange issue where the controllers may continue to rumble longer than 1/4 of a second.
 - When rumbling is enabled, a sound will also be played.
