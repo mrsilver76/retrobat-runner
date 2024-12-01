@@ -4,7 +4,7 @@
 #Warn
 
 ;
-; RetroBat Runner v1.0.1
+; RetroBat Runner v1.0.1 (1st December 2024)
 ; Automatically launch RetroBat when a specific button combination is
 ; pressed on any connected controller
 ; https://github.com/silver76/retrobat-runner/
@@ -67,7 +67,7 @@ confirmRumble := 1
 
 ; ----- End of configuration --------------------------------------------- 
 
-version :="1.0.1"
+version := "1.0.1"
 comboPos := 1
 lastButtonPress := 0
 lastButtonPressTimer := 0
@@ -173,8 +173,9 @@ Reset_Everything()
 Initialise()
 {
 	Global
+
 	; Get the path from the registry
-	global retrobatPath := RegRead("HKEY_CURRENT_USER\Software\RetroBat", "LatestKnownInstallPath", "")
+	Global retrobatPath := RegRead("HKEY_CURRENT_USER\Software\RetroBat", "LatestKnownInstallPath", "")
 	if (!retrobatPath)
 	{
 		; No registry key, so assume the default install location
@@ -210,6 +211,7 @@ Initialise()
 Combo_Executed()
 {
 	Global
+	
 	; If EmulationStation is already running then we shouldn't
 	; do anything
 	PID := ProcessExist("emulationstation.exe")	
@@ -249,7 +251,33 @@ Combo_Executed()
 		}
 	}	
 
-	; Now launch RetroBat
+	; Now we need to launch RetroBat ... but ... there is a problem.
+	;
+	; Sometimes EmulationStation (ES) doesn't properly activate. When this happens,
+	; you see ES almost full screen, but the Windows taskbar is visible (and maybe the odd
+	; window) and controller input isn't detected. 
+	;
+	; The obvious solution is to wait until ES starts and then just do:
+	;
+	;     WinActivate "ahk_class SDL_app"
+	; 
+	; but that causes a new problem - as when you launch a game from ES
+	; that uses RetroArch, RetroArch runs behind ES and you cannot control it. Even
+	; swapping out ahk_class to ahk_id doesn't work.
+	;
+	; This workaround mimics pretty much what someone sitting at their computer
+	; would do - which is to launch ES, wait until it appears and then click on it
+	; to bring it to the foreground.
+	;
+	; Firstly we need to minimise everything on the desktop and ensure
+	; that no window is active (by making the desktop active). This is so that
+	; when we position the pointer later on, it's not on top of any windows.
+	
+	SendInput "#m"
+	WinActivate "ahk_class Progman"
+	WinWaitActive "ahk_class Progman"
+
+	; Now we launch RetroBat
 
 	Try
 	{
@@ -261,26 +289,37 @@ Combo_Executed()
 		Return
 	}
 
-	; Sometimes EmulationStation (ES) doesn't properly activate. When this happens,
-	; you see ES full screen but also the Windows taskbar and controller input isn't
-	; detected. To work around this, we're going to wait for the ES process to start
-	; and then activate it.
+	; Now we wait until ES is running and then we move the mouse cursor to the centre of
+	; the screen and wait for ES to be detected under the mouse cursor (using `MouseGetPos`).
+	; Once we have this, we'll simulate a left mouse click.
 	
 	ESPid := ProcessWait("emulationstation.exe", 5)
 	If (ESPid)
 	{
-		; ES is running. Try 50 times to activate the ES screen, pausing 100ms each time.
+		; ES is running. Move the mouse to the centre of the screen.
+		CoordMode "Mouse", "Screen"
+		MouseMove A_ScreenWidth/2, A_ScreenHeight/2
+		
+		; Now loop 50 times, waiting until the PID under the mouse matches that of ES
 		Loop 50
 		{
+			MousePID := -1
 			Try
 			{
-				WinActivate("ahk_pid " . ESPid)
-				break
+				MouseGetPos ,,&ahkid
+				MousePid := WinGetPID(ahkid)  ; Convert ahk_id to pid
+			}
+			; If the mouse pid is the ES pid, then we know that ES is running under
+			; the mouse pointer ... so send a left-click.
+			If (MousePid == ESPid)
+			{
+				MouseClick "left"
+				Break
 			}
 			Sleep 100
-		}	
+		}
 	}
-	
+
 	; Wait for 5 seconds before accepting any input again
 	Sleep(5 * 1000)	
 }
