@@ -3,7 +3,7 @@
 This program runs in the system tray and automatically launches [RetroBat](https://www.retrobat.org/) when a specific button combination is pressed on any connected controller. This is useful for people who don't want to run RetroBat permanently and want an easy way to start it without using  keyboard or mouse.
 
 * 🎮 Support for all XInput controllers.
-* 🚀 One button click configuration to run with Windows.
+* 🚀 Menu option to automatically start with Windows.
 * 📳 All controllers vibrate (where supported) when the combination is correctly pressed.
 * 📢 Computer will play a sound when the combination is correctly pressed.
 * 💿 Works wherever RetroBat is installed.
