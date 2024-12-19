@@ -57,6 +57,8 @@ Possible future improvements can be found at https://github.com/mrsilver76/retro
 
 ### 1.1.0 (xst December 2024)
  - Added option to automatically start with Windows from the system tray.
+ - Cleaned up the "About" tray menu item
+ - Tidied up the documentation to focus more on people who just want to use the executable.
 
 ### 1.0.1 (1st December 2024)
 - Implemented workaround to resolve an issue where EmulationStation isn't the active window after starting up
