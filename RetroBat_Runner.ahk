@@ -4,7 +4,7 @@
 #Warn
 
 ;
-; RetroBat Runner v1.0.1 (1st December 2024)
+; RetroBat Runner v1.1.0 (22nd December 2024)
 ; Automatically launch RetroBat when a specific button combination is
 ; pressed on any connected controller
 ; https://github.com/silver76/retrobat-runner/
@@ -67,11 +67,12 @@ confirmRumble := 1
 
 ; ----- End of configuration --------------------------------------------- 
 
-version := "1.0.1"
+version := "1.1.0"
 comboPos := 1
 lastButtonPress := 0
 lastButtonPressTimer := 0
 buttonPress := 0
+startWithWindows := false
 
 Initialise()
 
@@ -195,14 +196,47 @@ Initialise()
 		Msgbox("Unable to find RetroBat at " retrobatPath, "RetroBat Runner", 16)
 		ExitApp 1
 	}
-
+		
 	; Configure system tray menu and set icon to RetroBat
 	
 	A_IconTip := "RetroBat Runner v" version
 	A_TrayMenu.Add()
+	A_TrayMenu.Add("Start with Windows", ToggleStartWithWindows)
 	A_TrayMenu.Add("About RetroBat Runner", About)
 	TraySetIcon(retrobatPath, 1, false)
+
+	; Work out if we're configured to run at startup
 	
+	startupExe := RegRead("HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run", "RetroBat Runner", "")
+	if (startupExe && startupExe == '"' A_ScriptFullPath '"')
+	{
+		A_TrayMenu.Check("Start with Windows")
+		startWithWindows := true
+	}
+}
+
+; ToggleStartWithWindows
+; Called when the "Start with Windows" menu option is clicked on.
+
+ToggleStartWithWindows(*)
+{	
+	Global
+	
+	; Toggle the menu item
+	
+	A_TrayMenu.ToggleCheck("Start with Windows")
+	startWithWindows := !startWithWindows
+	
+	; Write or delete the registry key for this current user
+	
+	if (startWithWindows == true)
+	{
+		RegWrite('"' A_ScriptFullPath '"', "REG_SZ", "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run", "RetroBat Runner")
+	}
+	else
+	{
+		RegDelete("HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run", "RetroBat Runner")
+	}
 }
 
 ; ComboExecuted
@@ -329,12 +363,11 @@ Combo_Executed()
 
 About(*)
 {	
-
 	; Generate button combination
 	buttons := ""
 	for buttonCode in comboButton
 	{
-		buttons .= (buttons ? ", " : "") GetButtonName(buttonCode)
+		buttons .= (buttons ? " then " : "") GetButtonName(buttonCode)
 	}
 
 	msg := "RetroBat Runner v" version "`n"
@@ -344,10 +377,11 @@ About(*)
 	msg .= "This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.`n`n"
 	
 	msg .= "RetroBat locaton: " retrobatPath "`n"
+	msg .= "Start with Windows: " (startWithWindows = 1 ? "yes" : "no") "`n"
+	msg .= "Button combo: " buttons "`n"
 	msg .= "Button timer: " buttonTimer " milliseconds`n"
-	msg .= "Rumble confirm: " (confirmRumble = 1 ? "yes" : "no") "`n"
-	msg .= "Button combo: " buttons
-			
+	msg .= "Rumble confirm: " (confirmRumble = 1 ? "yes" : "no")
+	
 	MsgBox msg, "About Retrobat Runner", 64
 }
 
