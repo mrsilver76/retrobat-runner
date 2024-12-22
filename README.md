@@ -55,7 +55,7 @@ Possible future improvements can be found at https://github.com/mrsilver76/retro
 
 ## Version history
 
-### 1.1.0 (xst December 2024)
+### 1.1.0 (22nd December 2024)
  - Added option to automatically start with Windows from the system tray.
  - Cleaned up the "About" tray menu item
  - Tidied up the documentation to focus more on people who just want to use the executable.
