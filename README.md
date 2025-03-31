@@ -7,8 +7,9 @@ This program runs in the system tray and automatically launches [RetroBat](https
 * 🚀 Menu option to automatically start with Windows.
 * 📳 All controllers vibrate (where supported) when the combination is correctly pressed.
 * 📢 Computer will play a sound when the combination is correctly pressed.
-* 💿 Works wherever RetroBat is installed.
+* 💿 Works wherever RetroBat is installed - even if it's on an external drive.
 * 🖥️ Low CPU and memory usage.
+* 🖊️ Source code is fully documented.
 
 ## Download
 
@@ -68,10 +69,7 @@ Possible future improvements can be found at https://github.com/mrsilver76/retro
 - Fixed bug where sometimes EmulationStation isn't correctly in focus after being launched.
 - After EmulationStation is running, the mouse cursor is now moved away to the top-right and is no longer visible.
 - Improved responsiveness to account for any Bluetooth controllers with sluggish input.
-
-> [!NOTE]
-> To support DirectInput controllers, release 1.2.0 removes the ability to define custom combination buttons and removes the ability to complete a combination on different controllers. If these features
-> are important to you then you should stick with release 1.1.0.
+- To support DirectInput controllers, the ability to define custom combination buttons and the ability to complete a combination on different controllers was removed.
 
 ### 1.1.0 (22nd December 2024)
  - Added option to automatically start with Windows from the system tray.
