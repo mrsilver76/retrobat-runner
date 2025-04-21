@@ -10,6 +10,7 @@ This program runs in the system tray and automatically launches [RetroBat](https
 * 💿 Works wherever RetroBat is installed - even if it's on an external drive.
 * 🖥️ Low CPU and memory usage.
 * 🖊️ Source code is fully documented.
+* 🪵 Debug logging to help diagnose problems.
 
 ## Download
 
@@ -70,6 +71,7 @@ Possible future improvements can be found at https://github.com/mrsilver76/retro
 - After EmulationStation is running, the mouse cursor is now moved away to the top-right and is no longer visible.
 - Improved responsiveness to account for any Bluetooth controllers with sluggish input.
 - To support DirectInput controllers, the ability to define custom combination buttons and the ability to complete a combination on different controllers was removed.
+- Cleaned up the quality of the code and applied consistent reformatting
 
 ### 1.1.0 (22nd December 2024)
  - Added option to automatically start with Windows from the system tray.
