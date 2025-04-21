@@ -40,13 +40,16 @@ To stop it starting with Windows, repeat the process again so that "Start with W
 
 To uninstall, delete the executable. There are no other files.
 
+> [!TIP]
+> If RetroBat Runner is not working for you then you can run executable with `/DEBUG` to generate a log file. If you raise any issues then you may be asked to provide this file.
+
 ## Source code
 
 If you want to view or edit the source code (`RetroBat_Runner.ahk`) then you can use any text editor. I recommend [Notepad++](https://notepad-plus-plus.org/) or [Visual Studio Code](https://code.visualstudio.com/), but the built-in Notepad will do. The code needs the XInput library (`XInput.ahk`) to run, so don't delete this file.
 
 To run or compile the code, you will need [AutoHotkey v2](https://www.autohotkey.com/) installed.
 
-The code is reasonably well documented and there are two variables that are easily configurable - how quickly you have to tap the buttons (`buttonTimer`) and whether the controllers rumble and the computer plays a sound when the combination is executed correctly (`confirmRumble`).
+The code is reasonably well documented and there are two variables that are easily configurable - how quickly you have to tap the buttons (`buttonTimer`) and whether the controllers rumble and the computer plays a sound when the combination is executed correctly (`confirmRumble`). If you want to work on the code and not keep running RetroBat all the time then set `testMode` to `1`.
 
 ## Attribution
 
