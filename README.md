@@ -41,7 +41,7 @@ To stop it starting with Windows, repeat the process again so that "Start with W
 To uninstall, delete the executable. There are no other files.
 
 > [!TIP]
-> If RetroBat Runner is not working for you then you can run executable with `/DEBUG` to generate a log file. If you raise any issues then you may be asked to provide this file.
+> If RetroBat Runner is not working for you then you can run the program with the command line argument `/debug` to generate a log file. If you raise any issues then you may be asked to provide this file.
 
 ## Source code
 
@@ -49,7 +49,9 @@ If you want to view or edit the source code (`RetroBat_Runner.ahk`) then you can
 
 To run or compile the code, you will need [AutoHotkey v2](https://www.autohotkey.com/) installed.
 
-The code is reasonably well documented and there are two variables that are easily configurable - how quickly you have to tap the buttons (`buttonTimer`) and whether the controllers rumble and the computer plays a sound when the combination is executed correctly (`confirmRumble`). If you want to work on the code and not keep running RetroBat all the time then set `testMode` to `1`.
+The code is reasonably well documented and there are two variables that are easily configurable - how quickly you have to tap the buttons (`buttonTimer`) and whether the controllers rumble and the computer plays a sound when the combination is executed correctly (`confirmRumble`).
+
+If you want to work on the code and not keep running RetroBat all the time then call the program with the `/test` command line argument and Notepad will be launched instead.
 
 ## Attribution
 
@@ -74,15 +76,18 @@ Possible future improvements can be found at https://github.com/mrsilver76/retro
 - After EmulationStation is running, the mouse cursor is now moved away to the top-right and is no longer visible.
 - Improved responsiveness to account for any Bluetooth controllers with sluggish input.
 - To support DirectInput controllers, the ability to define custom combination buttons and the ability to complete a combination on different controllers was removed.
-- Significantly improved the quality of the code and applied consistent code formatting
+- Significantly improved the quality of the code and applied consistent code formatting.
+- Reduced the CPU usage when EmulationStation is running.
+- Added the ability to enable debugging mode from the command line using `/debug`.
+- Added the ability to enable test mode from the command line using `/test` (this opens Notepad instead of RetroBat).
 
 ### 1.1.0 (22nd December 2024)
  - Added option to automatically start with Windows from the system tray.
- - Cleaned up the "About" tray menu item
+ - Cleaned up the "About" tray menu item.
  - Tidied up the documentation to focus more on people who just want to use the executable.
 
 ### 1.0.1 (1st December 2024)
-- Implemented workaround to resolve an issue where EmulationStation isn't the active window after starting up
+- Implemented workaround to resolve an issue where EmulationStation isn't the active window after starting up.
 - Implemented workaround to resolve a strange issue where the controllers may continue to rumble longer than 1/4 of a second.
 - When rumbling is enabled, a sound will also be played.
 - README tidied up and now includes specific warning about lack of support for DirectInput controllers.
