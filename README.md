@@ -24,7 +24,7 @@ _A program that runs in the system tray and automatically launches [RetroBat](ht
 * Launch RetroBat Runner by double-clicking on it. The location of your installation of RetroBat will be automatically detected.
 * RetroBat Runner will appear in your System Tray with the RetroBat icon.
 * The launch combination is **SELECT/BACK** followed by **START** on any connected controller.
-* You must press the **START** button within 1 second of pressing the **SELECT/BACK** button.
+* You must press the **START** button within 2 seconds of pressing the **SELECT/BACK** button.
 * If you press the combination correctly, all controllers will vibrate (if the controller supports this), a sound will be played and RetroBat will start.
 * If you do not press the combination correctly or you are too slow, then you will need to start the combination from the beginning again.
 * Pressing the combination whilst you are running RetroBat will do nothing.
@@ -45,7 +45,7 @@ To uninstall, delete the executable. There are no other files.
 > [!TIP]
 > If RetroBat Runner is not working for you then you can run the program with the command line argument `/debug` to generate a log file. If you raise any issues then you may be asked to provide this file.
 
-## Source code
+## Source code / developers
 
 If you want to view or edit the source code (`RetroBat_Runner.ahk`) then you can use any text editor. I recommend [Notepad++](https://notepad-plus-plus.org/) or [Visual Studio Code](https://code.visualstudio.com/), but the built-in Notepad will do. The code needs the XInput library (`XInput.ahk`) to run, so don't delete this file.
 
@@ -71,15 +71,15 @@ Possible future improvements can be found at https://github.com/mrsilver76/retro
 
 ## Version history
 
-### 1.2.0 (xx)
+### 1.2.0 (1st May 2025)
 - Added support for DirectInput and Bluetooth controllers.
 - Added support for Switch input mode with 8bitdo controllers.
 - Fixed bug where sometimes EmulationStation isn't correctly in focus after being launched.
 - After EmulationStation is running, the mouse cursor is now moved away to the top-right and is no longer visible.
-- Improved responsiveness to account for any Bluetooth controllers with sluggish input.
 - To support DirectInput controllers, the ability to define custom combination buttons and the ability to complete a combination on different controllers was removed.
 - Significantly improved the quality of the code and applied consistent code formatting.
 - Reduced the CPU usage when EmulationStation is running.
+- Increased button timeout from 1 second to 2 seconds to account for slow button presses and/or lag caused by Bluetooth.
 - Added the ability to enable debugging mode from the command line using `/debug`.
 - Added the ability to enable test mode from the command line using `/test` (this opens Notepad instead of RetroBat).
 
