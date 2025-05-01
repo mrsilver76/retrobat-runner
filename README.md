@@ -1,16 +1,18 @@
 # RetroBat Runner
 
-This program runs in the system tray and automatically launches [RetroBat](https://www.retrobat.org/) when a specific button combination is pressed on any connected controller. This is useful for people who don't want to run RetroBat permanently and want an easy way to start it without using  keyboard or mouse.
+_A program that runs in the system tray and automatically launches [RetroBat](https://www.retrobat.org/) when a specific button combination is pressed on any connected controller. This is useful for people who don't want to run RetroBat permanently on a computer and want an easy way to start it without using the keyboard or mouse._
 
-* 🎮 Support for all XInput controllers.
+## Features
+
+* 🎮 Supports both XInput and DirectInput controllers.
+* 🕹️ Supports [8bitdo controllers](https://www.8bitdo.com/) using the "Switch" input mode.
 * 🚀 Menu option to automatically start with Windows.
 * 📳 All controllers vibrate (where supported) when the combination is correctly pressed.
 * 📢 Computer will play a sound when the combination is correctly pressed.
-* 💿 Works wherever RetroBat is installed.
+* 💿 Works wherever RetroBat is installed - even if it's on an external drive.
 * 🖥️ Low CPU and memory usage.
 * 🖊️ Source code is fully documented.
-
-Controllers using DirectInput mode (such as the Sony DualShock) require [DS4Windows](https://ds4-windows.com/) for RetroBat Runner to work.
+* 🪵 Debug logging to help diagnose problems.
 
 ## Download
 
@@ -19,11 +21,16 @@ Controllers using DirectInput mode (such as the Sony DualShock) require [DS4Wind
 
 ## Running RetroBat Runner
 
-* Once RetroBat Runner is launched, it will appear in your System Tray with the RetroBat icon.
-* The launch combination is **SELECT/BACK** followed by **START**. It does not matter which controller you use and you can even use different controllers to complete the combination.
-* You must press the **START** button within 1 second of pressing the **SELECT/BACK** button. If you do not, then you will need to start the combination from the beginning again.
+* Launch RetroBat Runner by double-clicking on it. The location of your installation of RetroBat will be automatically detected.
+* RetroBat Runner will appear in your System Tray with the RetroBat icon.
+* The launch combination is **SELECT/BACK** followed by **START** on any connected controller.
+* You must press the **START** button within 2 seconds of pressing the **SELECT/BACK** button.
 * If you press the combination correctly, all controllers will vibrate (if the controller supports this), a sound will be played and RetroBat will start.
+* If you do not press the combination correctly or you are too slow, then you will need to start the combination from the beginning again.
 * Pressing the combination whilst you are running RetroBat will do nothing.
+
+> [!TIP]
+> You must use the same controller to complete the combination. You cannot press **SELECT/BACK** on one controller and **START** on a different controller.
 
 ## Installation instructions
 
@@ -33,17 +40,26 @@ The next time the current user logs into Windows (which will normally be when th
 
 To stop it starting with Windows, repeat the process again so that "Start with Windows" is unchecked.
 
-## Configuration instructions
+To uninstall, delete the executable. There are no other files.
 
-If you want to configure the program then you need to edit the source code in your preferred text editor. I recommend [Notepad++](https://notepad-plus-plus.org/) but Notepad will do. You will also need [AutoHotkey v2](https://www.autohotkey.com/) installed.
+> [!TIP]
+> If RetroBat Runner is not working for you then you can run the program with the command line argument `/debug` to generate a log file. If you raise any issues then you may be asked to provide this file.
 
-The code is fully documented and you can easily configure the button combination (`comboButton`), how quickly you have to tap the buttons (`buttonTimer`) and whether the controllers rumble and the computer plays a sound when the combination is executed correctly (`confirmRumble`).
+## Source code / developers
+
+If you want to view or edit the source code (`RetroBat_Runner.ahk`) then you can use any text editor. I recommend [Notepad++](https://notepad-plus-plus.org/) or [Visual Studio Code](https://code.visualstudio.com/), but the built-in Notepad will do. The code needs the XInput library (`XInput.ahk`) to run, so don't delete this file.
+
+To run or compile the code, you will need [AutoHotkey v2](https://www.autohotkey.com/) installed.
+
+The code is reasonably well documented and there are two variables that are easily configurable - how quickly you have to tap the buttons (`buttonTimer`) and whether the controllers rumble and the computer plays a sound when the combination is executed correctly (`confirmRumble`).
+
+If you want to work on the code and not keep running RetroBat all the time then call the program with the `/test` command line argument and Notepad will be launched instead.
 
 ## Attribution
 
-The Trail running icon was created by [Freepik - Flaticon](https://www.flaticon.com/free-icons/trail-running)
+The Trail running icon was created by [Freepik - Flaticon](https://www.flaticon.com/free-icons/trail-running).
 
-RetroBat is &copy; Adrien Chalard and the RetroBat Team. For more details visit the [website](https://www.retrobat.org/) or the [GitHub repository](https://github.com/RetroBat-Official). 
+RetroBat is copyright &copy; Adrien Chalard and the RetroBat Team. For more details visit the [website](https://www.retrobat.org/) or the [GitHub repository](https://github.com/RetroBat-Official). 
 
 ## Questions/problems?
 
@@ -55,13 +71,25 @@ Possible future improvements can be found at https://github.com/mrsilver76/retro
 
 ## Version history
 
+### 1.2.0 (1st May 2025)
+- Added support for DirectInput and Bluetooth controllers.
+- Added support for Switch input mode with 8bitdo controllers.
+- Fixed bug where sometimes EmulationStation isn't correctly in focus after being launched.
+- After EmulationStation is running, the mouse cursor is now moved away to the top-right and is no longer visible.
+- To support DirectInput controllers, the ability to define custom combination buttons and the ability to complete a combination on different controllers was removed.
+- Significantly improved the quality of the code and applied consistent code formatting.
+- Reduced the CPU usage when EmulationStation is running.
+- Increased button timeout from 1 second to 2 seconds to account for slow button presses and/or lag caused by Bluetooth.
+- Added the ability to enable debugging mode from the command line using `/debug`.
+- Added the ability to enable test mode from the command line using `/test` (this opens Notepad instead of RetroBat).
+
 ### 1.1.0 (22nd December 2024)
  - Added option to automatically start with Windows from the system tray.
- - Cleaned up the "About" tray menu item
+ - Cleaned up the "About" tray menu item.
  - Tidied up the documentation to focus more on people who just want to use the executable.
 
 ### 1.0.1 (1st December 2024)
-- Implemented workaround to resolve an issue where EmulationStation isn't the active window after starting up
+- Implemented workaround to resolve an issue where EmulationStation isn't the active window after starting up.
 - Implemented workaround to resolve a strange issue where the controllers may continue to rumble longer than 1/4 of a second.
 - When rumbling is enabled, a sound will also be played.
 - README tidied up and now includes specific warning about lack of support for DirectInput controllers.
