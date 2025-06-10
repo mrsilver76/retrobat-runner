@@ -14,12 +14,12 @@ _A program that runs in the system tray and automatically launches [RetroBat](ht
 * 🖊️ Source code is fully documented.
 * 🪵 Debug logging to help diagnose problems.
 
-## Download
+## 📦 Download
 
 * Get the latest version from [here](https://github.com/mrsilver76/retrobat-runner/releases).
 * Most people will want the file called `RetroBat_Runner.exe`.
 
-## Running RetroBat Runner
+## 🚀 Quick start guide
 
 * Launch RetroBat Runner by double-clicking on it. The location of your installation of RetroBat will be automatically detected.
 * RetroBat Runner will appear in your System Tray with the RetroBat icon.
@@ -28,6 +28,7 @@ _A program that runs in the system tray and automatically launches [RetroBat](ht
 * If you press the combination correctly, all controllers will vibrate (if the controller supports this), a sound will be played and RetroBat will start.
 * If you do not press the combination correctly or you are too slow, then you will need to start the combination from the beginning again.
 * Pressing the combination whilst you are running RetroBat will do nothing.
+* To change various options, right-click on the RetroBat icon in the system tray.
 
 > [!TIP]
 > You must use the same controller to complete the combination. You cannot press **SELECT/BACK** on one controller and **START** on a different controller.
