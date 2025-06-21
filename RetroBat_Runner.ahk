@@ -4,7 +4,7 @@
 #Warn
 
 ;
-; RetroBat Runner v1.2.0 (1st May 2025)
+; RetroBat Runner v1.3.0 (21st June 2025)
 ; Automatically launch RetroBat when a specific button combination is
 ; pressed on any connected controller
 ; https://github.com/silver76/retrobat-runner/
@@ -54,7 +54,7 @@ confirmRumble := 1
 
 ; ----- End of configuration ---------------------------------------------
 
-version := "1.2.0"
+version := "1.3.0"
 startWithWindows := false
 debugOutput := 0
 retrobatPath := ""
@@ -66,29 +66,36 @@ class INPUT_MODE {
 	static XInput := 2
 }
 
+ProcessSetPriority("Low")
 XInput_Init()
 Initialise()
+ShowFirstRunMessage()
 Logger("main", "Starting RetroBat Runner " version)
 
 lastCheck := 0
+lastInput := 0
+
 loop {
+	now := A_TickCount
 
-	if (emulationStationPID == 0)
+	; Check for a button press every 100ms
+	if (emulationStationPID == 0 && now - lastInput >= 100) {
 		Detect_First_Input()
+		lastInput := now
+	}
 
-	if (emulationStationPID > 0) {
-		; Check if 2 seconds have passed since last call
-    	if (A_TickCount - lastCheck >= 2000) {
-        	Check_ES_Status()
-        	lastCheck := A_TickCount
-		}
-    }
-	Sleep(100)
+	; Check if EmulationStation has closed every 3 seconds
+	if (emulationStationPID > 0 && now - lastCheck >= 3000) {
+		Check_ES_Status()
+		lastCheck := now
+	}
+
+	Sleep(10)
 }
 Exit
 
 ; Check_ES_Status
-; Called every couple of seconds to determine if EmulationStation is still running. If it is
+; Called every 3 seconds to determine if EmulationStation is still running. If it is
 ; not then we will start checking for controller input and execute any shutdown commands
 Check_ES_Status() {
 	global buttonTimer, confirmRumble, testMode, version, startWithWindows, debugOutput, retrobatPath, emulationStationPID
@@ -102,38 +109,65 @@ Check_ES_Status() {
 	; EmulationStation was running, but now isn't
 
 	Logger("Check_ES_Status", "EmulationStation (PID " emulationStationPID ") no longer exists")
-	emulationStationPID := 0
 
-	; Future development: configure a command that can be run when EmulationStation exists
+	; Wait a second to see if ES has started back up again. If it has, then we will assume
+	; that ES has been restarted and we should continue to monitor that new PID instead.
+	
+	Sleep(1000)
+	emulationStationPID := ProcessExist("emulationstation.exe")
+
+	; If we have a new PID then nothing more to do right now.
+
+	if (emulationStationPID > 0) {
+		Logger("Check_ES_Status", "EmulationStation PID now changed to " emulationStationPID)
+		return
+	}	
+
+	; EmulationStation has been closed down and has stayed down for more than one second, I
+	; think we can safely assume that it's not coming back...
+
+	; If a command has been configured to run after RetroBat has finished,
+	; now is the time to do it.
+
+	cmd := ""
+	try {
+		cmd := RegRead("HKEY_CURRENT_USER\Software\RetroBat Runner", "ExecuteAfter")
+		if (cmd) {
+			Logger("Check_ES_Status", "Executing after command: " cmd)
+			Run(cmd)
+		}
+	}
 }
 
 ; Detect_First_Input
 ; Main loop that identifies when a user presses the back/select button on their controller.
 Detect_First_Input() {
-	global buttonTimer, confirmRumble, testMode, version, startWithWindows, debugOutput, retrobatPath, emulationStationPID
+	global emulationStationPID
+	static dStart := 1
+	static xIndex := 0
 
-	loop 16 {
-		controllerID := A_Index
+	; To reduce CPU load, we'll check only 4 DirectInput and 1 XInput per call
 
-		; Check Direct Input or Bluetooth controllers
+	; Check 4 DirectInput IDs per call
+	loop 4 {
 		for button in [7, 9, 11] {
-			if GetKeyState(controllerID "Joy" button) {
-				Logger("Detect_First_Input", "Detected DirectInput: " controllerId "Joy" button)
-				Detect_Second_Input(controllerID, button, INPUT_MODE.DirectInput)
+			if GetKeyState(dStart "Joy" button) {
+				Logger("Detect_First_Input", "Detected GetKeyState(" dStart "Joy" button ") := true")
+				Detect_Second_Input(dStart, button, INPUT_MODE.DirectInput)
 				return
 			}
 		}
-
-		; Check XInput controllers
-		if (controllerID <= 4) {
-			state := XInput_GetState(controllerID - 1)
-			if (state && state.wButtons == XINPUT_GAMEPAD_BACK) {
-				Logger("Detect_First_Input", "Detected XInput: joy " controllerId " with state " state.wButtons)
-				Detect_Second_Input(controllerID - 1, XINPUT_GAMEPAD_BACK, INPUT_MODE.XInput)
-				return
-			}
-		}
+		dStart := (dStart & 15) + 1  ; wrap 1–16
 	}
+
+	; Check one XInput controller per call
+	state := XInput_GetState(xIndex)
+	if (state && state.wButtons == XINPUT_GAMEPAD_BACK) {
+		Logger("Detect_First_Input", "Detected XInput_GetState(" xIndex ") := " state.wButtons)
+		Detect_Second_Input(xIndex, XINPUT_GAMEPAD_BACK, INPUT_MODE.XInput)
+		return
+	}
+	xIndex := (xIndex + 1) & 3  ; wrap 0–3
 }
 
 ; Detect_Second_Input
@@ -263,7 +297,7 @@ Combo_Executed(controllerID, firstButton, inputMode) {
 	;
 	; The obvious solution is to wait until ES starts and then just do:
 	;
-	;     WinActivate "ahk_class SDL_app"
+	;	 WinActivate "ahk_class SDL_app"
 	;
 	; but that causes a new problem - as when you launch a game from ES
 	; that uses RetroArch, RetroArch runs behind ES and you cannot control it. Even
@@ -281,12 +315,24 @@ Combo_Executed(controllerID, firstButton, inputMode) {
 	WinActivate("ahk_class Progman")
 	WinWaitActive("ahk_class Progman",,2)
 
+	; If a command has been configured to run before RetroBat, now is
+	; the time to do it.
+
+	cmd := ""
+	try {
+		cmd := RegRead("HKEY_CURRENT_USER\Software\RetroBat Runner", "ExecuteBefore")
+		if (cmd) {
+			Logger("Combo_Executed", "Executing before command: " cmd)
+			Run(cmd)
+		}
+	}
+	
 	; Now we launch RetroBat
 
 	try {
 		Logger("Combo_Executed", "Executing " retrobatPath)
 		Run(retrobatPath, , "Max", &retroBatPID)
-		Logger("Combo_Executed", "RetroBat PID = " retroBatPID)
+		Logger("Combo_Executed", "RetroBat executed and running with PID " retroBatPID)
 	}
 	catch as e {
 		MsgBox("Unable to launch " retrobatPath "`n`n" e.Message, "RetroBat Runner", 48)
@@ -294,20 +340,14 @@ Combo_Executed(controllerID, firstButton, inputMode) {
 		return
 	}
 
-	; We've launched RetroBat and it will then launch EmulationStation - so we need to
-	; monitor the child processes that RetroBat spawns and identify the one that
-	; is EmulationStation
+	; We've launched RetroBat and it will then launch EmulationStation. So we need to
+	; wait for that to happen (within 50 x 100 = 5000ms) and grab the PID.
 
 	Loop 50 {
 		Sleep(100)
-		childPIDs := GetChildPIDs(retroBatPID)
-		for pid in childPIDs {
-			name := ProcessGetName(pid)
-			if name ~= "i)emulationstation" {
-				emulationStationPID := pid
-				break 2  ; exit both loops
-			}
-		}
+		emulationStationPID := ProcessExist("emulationstation.exe")
+		if (emulationStationPID > 0)
+			break
 	}
 
 	; If we don't have the EmulationStation PID then there isn't much we can do
@@ -316,9 +356,9 @@ Combo_Executed(controllerID, firstButton, inputMode) {
 		MsgBox("EmulationStation does not appear to be launching!", "RetroBat Runner", 48)
 		return
 	}
-	Logger("Combo_Executed", "EmulationStation PID = " emulationStationPID)
+	Logger("Combo_Executed", "Found emulationstation.exe with PID " emulationStationPID)
 
-	; We are going to  move the mouse cursor to the centre of the screen and wait for
+	; We are going to move the mouse cursor to the centre of the screen and wait for
 	; EmulationStation to be detected under the mouse cursor (using
 	; `MouseGetPos`). Once we have this, we'll simulate a left mouse click.
 
@@ -328,7 +368,7 @@ Combo_Executed(controllerID, firstButton, inputMode) {
 	; Now loop 50 times, waiting until the PID under the mouse matches that of EmulatonStation
 	loop 50 {
 		MouseGetPos(, , &winID)
-	    mousePID := WinGetPID("ahk_id " winID)
+		mousePID := WinGetPID("ahk_id " winID)
 
 		if (mousePID == emulationStationPID) {
 			break
@@ -418,6 +458,8 @@ Initialise() {
 	A_IconTip := "RetroBat Runner v" version
 	A_TrayMenu.Add()
 	A_TrayMenu.Add("Start with Windows", ToggleStartWithWindows)
+	A_TrayMenu.Add("Command before launch", CommandBeforeLaunch)
+	A_TrayMenu.Add("Command after exit", CommandAfterExit)
 	A_TrayMenu.Add("About RetroBat Runner", About)
 	TraySetIcon(retrobatPath, 1, false)
 
@@ -434,6 +476,8 @@ Initialise() {
 ; Called when the "Start with Windows" menu option is clicked on.
 ToggleStartWithWindows(*) {
 	global buttonTimer, confirmRumble, testMode, version, startWithWindows, debugOutput, retrobatPath, emulationStationPID
+
+	Logger("ToggleStartWithWindows", "Entering function")
 
 	; Toggle the menu item
 
@@ -455,18 +499,34 @@ ToggleStartWithWindows(*) {
 About(*) {
 	global buttonTimer, confirmRumble, testMode, version, startWithWindows, debugOutput, retrobatPath, emulationStationPID
 
+	Logger("About", "Entering function")
+
 	msg := "RetroBat Runner v" version "`n"
 	msg .= "https://github.com/mrsilver76/retrobat-runner/`n"
 	msg .= "Automatically launch RetroBat after a specific combination has been pressed on any attached controller`n`n"
 
-	msg .=
-		"This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.`n`n"
+	msg .= "This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.`n`n"
 
 	msg .= "RetroBat locaton: " retrobatPath "`n"
 	msg .= "Start with Windows: " (startWithWindows = 1 ? "yes" : "no") "`n"
-	msg .= "Button combo: BACK/SELECT then START`n"
+	msg .= "Button combo: BACK (or SELECT) then START`n"
 	msg .= "Button timer: " buttonTimer " milliseconds`n"
 	msg .= "Sound & rumble confirm: " (confirmRumble = 1 ? "yes`n" : "no`n")
+
+	cmd := ""
+	
+	try {
+		cmd := RegRead("HKEY_CURRENT_USER\Software\RetroBat Runner", "ExecuteBefore")
+		if (cmd) {
+			msg .= "Execute before: " cmd "`n"
+		}
+	}
+	try {
+		cmd := RegRead("HKEY_CURRENT_USER\Software\RetroBat Runner", "ExecuteAfter")
+		if (cmd) {
+			msg .= "Execute after: " cmd "`n"
+		}
+	}
 
 	if (testMode)
 		msg .= "Test mode: enabled`n"
@@ -489,4 +549,149 @@ GetChildPIDs(parentPID) {
 		children.Push(process.ProcessId)
 	}
 	return children
+}
+
+CommandBeforeLaunch(*) {
+	ConfigureBeforeAfterCommand(true)
+}
+
+CommandAfterExit(*) {
+	ConfigureBeforeAfterCommand(false)
+}
+
+; ConfigureBeforeAfterCommand
+; Present the user with the ability to edit the command that runs before
+; or after RetroBat starts/exits.
+ConfigureBeforeAfterCommand(before := true) {
+
+	regKey := "HKEY_CURRENT_USER\Software\RetroBat Runner"
+	valueName := before ? "ExecuteBefore" : "ExecuteAfter"
+	label := before ? "before RetroBat starts" : "after RetroBat exits"
+
+	Logger("ConfigureBeforeAfterCommand", "Entering function, valueName = " valueName)
+
+	; Load existing value if it exists
+	storedCommand := ""
+	try storedCommand := RegRead(regKey, valueName)
+
+	ret := InputBox("Enter the full command and any arguments to execute " label ":", "Configure command", , storedCommand)
+
+	if (ret.Result != "OK")
+		return  ; User cancelled
+
+	original := ret.Value
+
+	Logger("ConfigureBeforeAfterCommand", "Received input: " original)
+
+	fixed := FixExecutablePath(original)
+	Logger("ConfigureBeforeAfterCommand", "Fixed version: " fixed)
+
+	; If FixExecutablePath returns something different, confirm change
+	if (fixed != original) {
+		msg := "The command you entered might need quotes added for correct execution." . "`n`n"
+		msg .= "Original:`n" original . "`n`n"
+		msg .= "Suggested:`n" fixed . "`n`n"
+		msg .= "Would you like to accept the suggested correction?"
+		userChoice := MsgBox(msg, "Possible Command Fix", "YesNoCancel Icon?")
+
+		if (userChoice = "Yes") {
+			final := fixed
+		} else if (userChoice = "No") {
+			final := original
+		} else {
+			return  ; Cancelled
+		}
+	} else {
+		final := original
+	}
+
+	Logger("ConfigureBeforeAfterCommand", "Saving " regKey "\" valueName " = " final)
+
+	; Save to registry
+	RegWrite final, "REG_SZ", regKey, valueName
+}
+
+
+; FixExecutablePath
+; Given a path, filename and arguments, try and work out if the quotes around the executable
+; have been incorrectly missed out. If they have, return a proposed alternative.
+FixExecutablePath(cmdLine) {
+
+	Logger("FixExecutablePath", "Entering function")
+
+	cmdLine := Trim(cmdLine)
+
+	; If already quoted at the start, check if it's valid and return as-is
+	if (SubStr(cmdLine, 1, 1) = '"') {
+		quoteEnd := InStr(cmdLine, '"', , 2)
+		if (quoteEnd > 1) {
+			quotedPath := SubStr(cmdLine, 2, quoteEnd - 2)
+			if FileExist(quotedPath) && !InStr(FileExist(quotedPath), "D")
+				return cmdLine
+		}
+		return cmdLine
+	}
+
+	; We're now going to try and see if we can work out what the path
+	; and executable is and what else are the arguments.
+
+	Logger("FixExecutablePath", "Attempting to find executable")
+
+	; Split the command line into segments (using space as the delimiter).
+	segments := StrSplit(cmdLine, " ")
+	path := ""
+	; Append a segment to the path variable
+	for i, segment in segments {
+		if (path != "")
+			path .= " "
+		path .= segment
+
+		; Test if path points to a valid executable
+		if FileExist(path) && !InStr(FileExist(path), "D") {
+			; It does, so path contains the full path and filename of the
+			; executable and everything beyond that are aguments.			
+			quotedPath := InStr(path, " ") ? '"' path '"' : path
+			rest := Trim(SubStr(cmdLine, StrLen(path) + 1))
+			return quotedPath . (rest != "" ? " " . rest : "")
+		}
+	}
+
+	return cmdLine
+}
+
+; ShowFirstRunMessage
+; Display a welcome message and tooltip if this is the first time that
+; someone has ever run this program.
+ShowFirstRunMessage()
+{
+	; Read the registry key that records if first run has been done
+	try {
+		shown := RegRead("HKEY_CURRENT_USER\Software\RetroBat Runner", "FirstRunShown")
+	}
+	catch {
+		shown := ""
+	}
+
+	; Don't do anything if this isn't the first time
+	if (shown != "")
+		return
+
+	Logger("ShowFirstRunMessage", "Showing first run messages")
+
+	; Pop-up welcome message
+	msg := "Welcome to RetroBat Runner!`n"
+	msg .= "`n"
+	msg .= "To launch RetroBat, press SELECT (or BACK) and then START on the same controller within " Integer(buttonTimer/1000) " seconds.`n"
+	msg .= "`n"
+	msg .= "This message won't be shown again."
+	MsgBox(msg, "RetroBat Runner", "OK Iconi")
+
+	; Slight pause (2 seconds)
+	Sleep(2000)
+
+	; Tooltip: tray customization reminder
+	TrayTip("Right-click the RetroBat tray icon to configure various options.", "RetroBat Runner", 4)
+
+	; Record that first run has been handled
+	RegWrite "1", "REG_SZ", "HKEY_CURRENT_USER\Software\RetroBat Runner", "FirstRunShown"
 }
