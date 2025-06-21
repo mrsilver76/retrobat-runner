@@ -6,13 +6,15 @@ _A program that runs in the system tray and automatically launches [RetroBat](ht
 
 * 🎮 Supports both XInput and DirectInput controllers.
 * 🕹️ Supports [8bitdo controllers](https://www.8bitdo.com/) using the "Switch" input mode.
-* 🚀 Menu option to automatically start with Windows.
 * 📳 All controllers vibrate (where supported) when the combination is correctly pressed.
 * 📢 Computer will play a sound when the combination is correctly pressed.
+* 🔄 Can automatically launch another program before RetroBat starts.
+* 🚀 Menu option to automatically start with Windows.
+* 🔚 Can automatically launch another program after EmulationStation closes.
 * 💿 Works wherever RetroBat is installed - even if it's on an external drive.
 * 🖥️ Low CPU and memory usage.
-* 🖊️ Source code is fully documented.
 * 🪵 Debug logging to help diagnose problems.
+* 🖊️ Source code is fully documented.
 
 ## 📦 Download
 
