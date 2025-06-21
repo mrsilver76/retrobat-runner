@@ -71,11 +71,12 @@ RetroBat is copyright &copy; Adrien Chalard and the RetroBat Team. For more deta
 
 ## 🕰️ Version history
 
-### 1.3.0
+### 1.3.0 (21st June 2025)
 - Display a first run message and tooltip to guide new users.
 - Enable configuring of a program to run before RetroBat is started.
 - Enable configuring of a program to run after EmulationStation has been closed (thanks to tkropp17 for help in debugging)
 - Added additional debug logging.
+- Reduced CPU usage when idle.
 - Updated README.
 
 ### 1.2.0 (1st May 2025)
