@@ -2,7 +2,7 @@
 
 _A program that runs in the system tray and automatically launches [RetroBat](https://www.retrobat.org/) when a specific button combination is pressed on any connected controller. This is useful for people who don't want to run RetroBat permanently on a computer and want an easy way to start it without using the keyboard or mouse._
 
-## Features
+## 🧰 Features
 
 * 🎮 Supports both XInput and DirectInput controllers.
 * 🕹️ Supports [8bitdo controllers](https://www.8bitdo.com/) using the "Switch" input mode.
@@ -14,12 +14,12 @@ _A program that runs in the system tray and automatically launches [RetroBat](ht
 * 🖊️ Source code is fully documented.
 * 🪵 Debug logging to help diagnose problems.
 
-## Download
+## 📦 Download
 
 * Get the latest version from [here](https://github.com/mrsilver76/retrobat-runner/releases).
 * Most people will want the file called `RetroBat_Runner.exe`.
 
-## Running RetroBat Runner
+## 🚀 Quick start guide
 
 * Launch RetroBat Runner by double-clicking on it. The location of your installation of RetroBat will be automatically detected.
 * RetroBat Runner will appear in your System Tray with the RetroBat icon.
@@ -28,6 +28,7 @@ _A program that runs in the system tray and automatically launches [RetroBat](ht
 * If you press the combination correctly, all controllers will vibrate (if the controller supports this), a sound will be played and RetroBat will start.
 * If you do not press the combination correctly or you are too slow, then you will need to start the combination from the beginning again.
 * Pressing the combination whilst you are running RetroBat will do nothing.
+* To change various options, right-click on the RetroBat icon in the system tray.
 
 > [!TIP]
 > You must use the same controller to complete the combination. You cannot press **SELECT/BACK** on one controller and **START** on a different controller.
@@ -42,34 +43,41 @@ To stop it starting with Windows, repeat the process again so that "Start with W
 
 To uninstall, delete the executable. There are no other files.
 
-> [!TIP]
-> If RetroBat Runner is not working for you then you can run the program with the command line argument `/debug` to generate a log file. If you raise any issues then you may be asked to provide this file.
+## 💻 Source code / developers
 
-## Source code / developers
+If you want to view or edit the source code (`RetroBat_Runner.ahk`) then you can use any text editor. I recommend [Notepad++](https://notepad-plus-plus.org/) or [Visual Studio Code](https://code.visualstudio.com/), but the built-in Notepad will do. The code needs the XInput library (`XInput.ahk`) to run, so don't delete this file. To run or compile the code, you will need [AutoHotkey v2](https://www.autohotkey.com/) installed.
 
-If you want to view or edit the source code (`RetroBat_Runner.ahk`) then you can use any text editor. I recommend [Notepad++](https://notepad-plus-plus.org/) or [Visual Studio Code](https://code.visualstudio.com/), but the built-in Notepad will do. The code needs the XInput library (`XInput.ahk`) to run, so don't delete this file.
+There are two command line options available:
 
-To run or compile the code, you will need [AutoHotkey v2](https://www.autohotkey.com/) installed.
+- **`/debug`**   
+  Writes out a debug file to the same location and with the same name as the executable followed by `.log` (e.g. `RetroBat_Runner.exe.log`). This log contains additional information that can be useful when trying to resolve issues. Any existing log file will be overwritten.
 
-The code is reasonably well documented and there are two variables that are easily configurable - how quickly you have to tap the buttons (`buttonTimer`) and whether the controllers rumble and the computer plays a sound when the combination is executed correctly (`confirmRumble`).
+- **`/test`**   
+  Causes RetroBat Runner to launch `notepad.exe` instead of RetroBat. This is useful during development to speed up testing.   
 
-If you want to work on the code and not keep running RetroBat all the time then call the program with the `/test` command line argument and Notepad will be launched instead.
+## 🛟 Questions/problems?
 
-## Attribution
+Please raise an issue at https://github.com/mrsilver76/retrobat-runner/issues.
+
+## 💡 Future development: open but unplanned
+
+RetroBat Runner currently meets the needs it was designed for, and no major new features are planned at this time. However, the project remains open to community suggestions and improvements. If you have ideas or see ways to enhance the tool, please feel free to submit a [feature request](https://github.com/mrsilver76/retrobat-runner/issues).
+
+## 📝 Attribution
 
 The Trail running icon was created by [Freepik - Flaticon](https://www.flaticon.com/free-icons/trail-running).
 
 RetroBat is copyright &copy; Adrien Chalard and the RetroBat Team. For more details visit the [website](https://www.retrobat.org/) or the [GitHub repository](https://github.com/RetroBat-Official). 
 
-## Questions/problems?
+## 🕰️ Version history
 
-Please raise an issue at https://github.com/mrsilver76/retrobat-runner/issues.
-
-## Future improvements
-
-Possible future improvements can be found at https://github.com/mrsilver76/retrobat-runner/labels/enhancement. Unless there is significant interest, it's doubtful I'll implement many of them as the program in its current form suits me just fine.
-
-## Version history
+### 1.3.0 (21st June 2025)
+- Display a first run message and tooltip to guide new users.
+- Enable configuring of a program to run before RetroBat is started.
+- Enable configuring of a program to run after EmulationStation has been closed (thanks to tkropp17 for help in debugging)
+- Added additional debug logging.
+- Reduced CPU usage when idle.
+- Updated README.
 
 ### 1.2.0 (1st May 2025)
 - Added support for DirectInput and Bluetooth controllers.
