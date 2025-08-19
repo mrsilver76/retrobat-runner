@@ -67,12 +67,16 @@ RetroBat Runner currently meets the needs it was designed for, and no major new 
 
 ## 📝 Attribution
 
-The Trail running icon was created by [Freepik - Flaticon](https://www.flaticon.com/free-icons/trail-running).
-
-RetroBat is copyright &copy; Adrien Chalard and the RetroBat Team. For more details visit the [website](https://www.retrobat.org/) or the [GitHub repository](https://github.com/RetroBat-Official). 
+- The Trail running icon was created by [Freepik - Flaticon](https://www.flaticon.com/free-icons/trail-running).
+- RetroBat is copyright &copy; Adrien Chalard and the RetroBat Team. For more details visit the [website](https://www.retrobat.org/) or the [GitHub repository](https://github.com/RetroBat-Official). 
 
 ## 🕰️ Version history
 
+### 1.3.1 (19th August 2025)
+- Added a workaround for the unhelpful and random "invalid memory read/write" error.
+- Changed the launch order so that external programs now run before windows are minimised, preventing them from covering RetroBat when it starts.
+- Added a menu option to visit the RetroBat Runner website on Github.
+ 
 ### 1.3.0 (21st June 2025)
 - Display a first run message and tooltip to guide new users.
 - Enable configuring of a program to run before RetroBat is started.
