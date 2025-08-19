@@ -4,7 +4,7 @@
 #Warn
 
 ;
-; RetroBat Runner v1.3.0 (21st June 2025)
+; RetroBat Runner v1.3.1 (19th August 2025)
 ; Automatically launch RetroBat when a specific button combination is
 ; pressed on any connected controller
 ; https://github.com/silver76/retrobat-runner/
@@ -54,7 +54,7 @@ confirmRumble := 1
 
 ; ----- End of configuration ---------------------------------------------
 
-version := "1.3.0"
+version := "1.3.1"
 startWithWindows := false
 debugOutput := 0
 retrobatPath := ""
@@ -151,23 +151,28 @@ Detect_First_Input() {
 	; Check 4 DirectInput IDs per call
 	loop 4 {
 		for button in [7, 9, 11] {
-			if GetKeyState(dStart "Joy" button) {
-				Logger("Detect_First_Input", "Detected GetKeyState(" dStart "Joy" button ") := true")
-				Detect_Second_Input(dStart, button, INPUT_MODE.DirectInput)
-				return
+			keyName := dStart . "Joy" . button
+			try {  ; Avoids and ignores "invalid memory read/write" error
+				if GetKeyState(keyName) {
+					Logger("Detect_First_Input", "Detected GetKeyState(" keyname ") := true")
+					Detect_Second_Input(dStart, button, INPUT_MODE.DirectInput)
+					return
+				}
 			}
 		}
-		dStart := (dStart & 15) + 1  ; wrap 1–16
+		dStart := Mod(dStart, 16) + 1  ; wrap 1–16
 	}
 
 	; Check one XInput controller per call
-	state := XInput_GetState(xIndex)
-	if (state && state.wButtons == XINPUT_GAMEPAD_BACK) {
-		Logger("Detect_First_Input", "Detected XInput_GetState(" xIndex ") := " state.wButtons)
-		Detect_Second_Input(xIndex, XINPUT_GAMEPAD_BACK, INPUT_MODE.XInput)
-		return
+	try {  ; Avoids and ignores any possible error
+		state := XInput_GetState(xIndex)
+		if (state && state.wButtons == XINPUT_GAMEPAD_BACK) {
+			Logger("Detect_First_Input", "Detected XInput_GetState(" xIndex ") := " state.wButtons)
+			Detect_Second_Input(xIndex, XINPUT_GAMEPAD_BACK, INPUT_MODE.XInput)
+			return
+		}
 	}
-	xIndex := (xIndex + 1) & 3  ; wrap 0–3
+	xIndex := Mod(xIndex, 3) + 1  ; wrap 0–3
 }
 
 ; Detect_Second_Input
@@ -306,14 +311,6 @@ Combo_Executed(controllerID, firstButton, inputMode) {
 	; This workaround mimics pretty much what someone sitting at their computer
 	; would do - which is to launch ES, wait until it appears and then click on it
 	; to bring it to the foreground.
-	;
-	; Firstly we need to minimise everything on the desktop and ensure
-	; that no window is active (by making the desktop active). This is so that
-	; when we position the pointer later on, it's not on top of any windows.
-
-	SendInput("#m")
-	WinActivate("ahk_class Progman")
-	WinWaitActive("ahk_class Progman",,2)
 
 	; If a command has been configured to run before RetroBat, now is
 	; the time to do it.
@@ -323,10 +320,24 @@ Combo_Executed(controllerID, firstButton, inputMode) {
 		cmd := RegRead("HKEY_CURRENT_USER\Software\RetroBat Runner", "ExecuteBefore")
 		if (cmd) {
 			Logger("Combo_Executed", "Executing before command: " cmd)
-			Run(cmd)
+			Run(cmd,,,&pid)
+			if (pid) {
+				; We use this to block RetroBat Runner until a window appears,
+				; suggesting that the program has launched. If one doesn't appear
+				; within 2 seconds then we give up and continue onwards.
+				hwnd := WinWait("ahk_pid " pid,,2)
+			}
 		}
 	}
-	
+
+	; Now minimise everything on the desktop and ensure that no window
+	; is active (by making the desktop active). This is so that when we 
+	; position the pointer later on, it's not on top of any windows.
+
+	SendInput("#m")
+	WinActivate("ahk_class Progman")
+	WinWaitActive("ahk_class Progman",,2)
+
 	; Now we launch RetroBat
 
 	try {
@@ -460,6 +471,7 @@ Initialise() {
 	A_TrayMenu.Add("Start with Windows", ToggleStartWithWindows)
 	A_TrayMenu.Add("Command before launch", CommandBeforeLaunch)
 	A_TrayMenu.Add("Command after exit", CommandAfterExit)
+	A_TrayMenu.Add("Visit RetroBat Runner website", VisitWebsite)
 	A_TrayMenu.Add("About RetroBat Runner", About)
 	TraySetIcon(retrobatPath, 1, false)
 
@@ -492,6 +504,18 @@ ToggleStartWithWindows(*) {
 	else {
 		RegDelete("HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run", "RetroBat Runner")
 	}
+}
+
+; VisitWebsite
+; Launches the default browser taking the user to the RetroBat
+; Runner website
+VisitWebsite(*) {
+	; This fixes an issue where the default browser is sometimes
+	; deactivated after calling "Run"
+	WinActivate('ahk_class Progman')
+
+	; Launch website in default browser
+	Run("https://github.com/mrsilver76/retrobat-runner")
 }
 
 ; About
@@ -537,18 +561,6 @@ About(*) {
 	msg := RegExReplace(msg, "`n$", "")
 
 	MsgBox msg, "About Retrobat Runner", 64
-}
-
-; GetChildPIDs
-; Given a process ID, get a list of all the child processes that it has called
-GetChildPIDs(parentPID) {
-	children := []
-	query := "SELECT ProcessId FROM Win32_Process WHERE ParentProcessId = " parentPID
-
-	for process in ComObject("WbemScripting.SWbemLocator").ConnectServer().ExecQuery(query) {
-		children.Push(process.ProcessId)
-	}
-	return children
 }
 
 CommandBeforeLaunch(*) {
