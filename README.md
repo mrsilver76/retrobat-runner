@@ -75,7 +75,7 @@ RetroBat Runner currently meets the needs it was designed for, and no major new 
 ### 1.3.1 (19th August 2025)
 - Added a workaround for the unhelpful and random "invalid memory read/write" error.
 - Changed the launch order so that external programs now run before windows are minimised, preventing them from covering RetroBat when it starts.
-- Added a menu option to go to the RetroBat Runner websitre on Github.
+- Added a menu option to visit the RetroBat Runner website on Github.
  
 ### 1.3.0 (21st June 2025)
 - Display a first run message and tooltip to guide new users.
