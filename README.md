@@ -72,6 +72,9 @@ RetroBat Runner currently meets the needs it was designed for, and no major new 
 
 ## 🕰️ Version history
 
+### 1.3.2 (22nd August 2025)
+- Added support for RetroBat v7.3 by launching `RetroBat-new.exe` when the button combo is pressed. Older versions using `RetroBat.exe` are still supported.
+
 ### 1.3.1 (19th August 2025)
 - Added a workaround for the unhelpful and random "invalid memory read/write" error.
 - Changed the launch order so that external programs now run before windows are minimised, preventing them from covering RetroBat when it starts.
