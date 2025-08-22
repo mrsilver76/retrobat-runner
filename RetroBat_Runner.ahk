@@ -4,7 +4,7 @@
 #Warn
 
 ;
-; RetroBat Runner v1.3.1 (19th August 2025)
+; RetroBat Runner v1.3.2 (22nd August 2025)
 ; Automatically launch RetroBat when a specific button combination is
 ; pressed on any connected controller
 ; https://github.com/silver76/retrobat-runner/
@@ -54,7 +54,7 @@ confirmRumble := 1
 
 ; ----- End of configuration ---------------------------------------------
 
-version := "1.3.1"
+version := "1.3.2"
 startWithWindows := false
 debugOutput := 0
 retrobatPath := ""
@@ -455,14 +455,29 @@ Initialise() {
 	if (!SubStr(retrobatPath, -1) == "\") {
 		retrobatPath .= "\"
 	}
-	; Append the executable name
-	retrobatPath .= "retrobat.exe"
 
-	; Check if this exists
-	if (!FileExist(retrobatPath)) {
-		Msgbox("Unable to find RetroBat at " retrobatPath, "RetroBat Runner", 16)
+	; In the latest release of RetroBat, the executable could be
+	; called "retrobat.exe" or "retrobat-new.exe", so we need to check
+	; for both in that order.
+
+	foundPath := ""
+
+	for exeName in ["retrobat-new.exe", "retrobat.exe"] {
+		pathToCheck := retrobatPath exeName
+		if (FileExist(pathToCheck)) {
+			foundPath := pathToCheck
+			break
+		}
+	}
+
+	; Since foundPath is blank, we cannot find either of the executable names
+	if (!foundPath) {
+		Msgbox("Unable to find retrobat-new.exe or retrobat.exe at " retrobatPath, "RetroBat Runner", 16)
 		ExitApp 1
 	}
+
+	; Set retrobatPath the path we found
+	retrobatPath := foundPath
 
 	; Configure system tray menu and set icon to RetroBat
 
