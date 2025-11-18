@@ -21,6 +21,10 @@ _A program that runs in the system tray and automatically launches [RetroBat](ht
 * Get the latest version from [here](https://github.com/mrsilver76/retrobat-runner/releases).
 * Most people will want the file called `RetroBat_Runner.exe`.
 
+>[!WARNING]
+>RetroBat v7.3 to v7.5 renamed the main executable to `RetroBat-new.exe`. If you wish to using any of those versions,
+>you must download and use the older RetroBat Runner [v1.3.2](https://github.com/mrsilver76/retrobat-runner/releases/tag/1.3.2).
+
 ## 🚀 Quick start guide
 
 * Launch RetroBat Runner by double-clicking on it. The location of your installation of RetroBat will be automatically detected.
@@ -71,6 +75,10 @@ RetroBat Runner currently meets the needs it was designed for, and no major new 
 - RetroBat is copyright &copy; Adrien Chalard and the RetroBat Team. For more details visit the [website](https://www.retrobat.org/) or the [GitHub repository](https://github.com/RetroBat-Official). 
 
 ## 🕰️ Version history
+
+### 1.4.0 (xx November 2025)
+- Removed automatic preference for `RetroBat-new.exe` because RetroBat v7.5.1 no longer uses this executable and doesn’t delete it during upgrades, so RetroBat Runner can’t rely on it being the correct one.
+- If "shutdown" or "restart" is used within EmulationStation, RetroBat Runner will attempt to execute any configured exit command prior to closing.
 
 ### 1.3.2 (22nd August 2025)
 - Added support for RetroBat v7.3 by launching `RetroBat-new.exe` when the button combo is pressed. Older versions using `RetroBat.exe` are still supported.
