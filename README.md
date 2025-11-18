@@ -18,8 +18,14 @@ _A program that runs in the system tray and automatically launches [RetroBat](ht
 
 ## 📦 Download
 
-* Get the latest version from [here](https://github.com/mrsilver76/retrobat-runner/releases).
-* Most people will want the file called `RetroBat_Runner.exe`.
+Get the latest version from https://github.com/mrsilver76/groupmachine/releases.
+
+There is no installer. Just download the executable and run it either by double-clicking or from the command line. 
+
+|Platform|Download|
+|:--------|:-----------|
+|Microsoft Windows 10 & 11|`RetroBat_Runner.exe` ✅ **Most users want this**|
+|Other/Developers|Source code (zip / tar.gz)|
 
 >[!WARNING]
 >RetroBat v7.3 to v7.5 renamed the main executable to `RetroBat-new.exe`. If you wish to using any of those versions,
