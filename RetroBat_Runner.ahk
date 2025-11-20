@@ -4,7 +4,7 @@
 #Warn
 
 ;
-; RetroBat Runner v1.3.2 (22nd August 2025)
+; RetroBat Runner v1.4.0 (20th November 2025)
 ; Automatically launch RetroBat when a specific button combination is
 ; pressed on any connected controller
 ; https://github.com/silver76/retrobat-runner/
@@ -54,7 +54,7 @@ confirmRumble := 1
 
 ; ----- End of configuration ---------------------------------------------
 
-version := "1.3.2"
+version := "1.4.0"
 startWithWindows := false
 debugOutput := 0
 retrobatPath := ""
@@ -126,10 +126,18 @@ Check_ES_Status() {
 	; EmulationStation has been closed down and has stayed down for more than one second, I
 	; think we can safely assume that it's not coming back...
 
+	; Disable the OnExit handler
+	OnExit(OnExitHandler, 0)
+
 	; If a command has been configured to run after RetroBat has finished,
 	; now is the time to do it.
+	Run_Exectute_After()
+}
 
-	cmd := ""
+; Run_Execute_After
+; Checks if there is a command stored in the registry that needs to be run after
+; EmulationStation exits and then runs it.
+Run_Exectute_After() {
 	try {
 		cmd := RegRead("HKEY_CURRENT_USER\Software\RetroBat Runner", "ExecuteAfter")
 		if (cmd) {
@@ -137,6 +145,25 @@ Check_ES_Status() {
 			Run(cmd)
 		}
 	}
+}
+
+; OnExitHandler
+; Called whenever the script is about to exit. This is used to capture any
+; shutdown events triggered by EmulationStation
+OnExitHandler(exitReason, *) {
+	; Only trigger if we are shutting down or restarting
+	if (exitReason != "Shutdown") {
+		; Return 1 to ignore
+		return 1
+	}
+
+	; If a command has been configured to run after RetroBat has finished,
+	; now is the time to do it.
+	Run_Exectute_After()
+
+	; Disable the OnExit handler, just to be safe.
+	OnExit(OnExitHandler, 0)
+
 }
 
 ; Detect_First_Input
@@ -177,7 +204,7 @@ Detect_First_Input() {
 
 ; Detect_Second_Input
 ; Second loop that identifies if the same controller then follows up with the start button within
-; one second of releasing the first button.
+; 'buttonTimer' milliseconds (default: 2000) of releasing the first button.
 Detect_Second_Input(controllerID, firstButton, inputMode) {
 	global buttonTimer, confirmRumble, testMode, version, startWithWindows, debugOutput, retrobatPath, emulationStationPID
 
@@ -186,6 +213,7 @@ Detect_Second_Input(controllerID, firstButton, inputMode) {
 
 	Logger("Detect_Second_Input", "Entering function")
 
+	; Set the button we expect to see next, based on the inputMode used
 	if (inputMode == INPUT_MODE.DirectInput)
 		expectedButton := firstButton + 1
 	else
@@ -193,8 +221,8 @@ Detect_Second_Input(controllerID, firstButton, inputMode) {
 
 	startTime := A_TickCount  ; Get the current time
 
-	; Now wait for the configured amount of time waiting for the second
-	; button in the combo to be pressed
+	; Now check for 'buttonTimer' milliseconds if the second button (defined by 'expectedButton')
+	; is pressed.
 
 	while (A_TickCount - startTime <= buttonTimer) {
 		if (inputMode = INPUT_MODE.DirectInput && GetKeyState(controllerID "Joy" expectedButton)) {
@@ -210,7 +238,8 @@ Detect_Second_Input(controllerID, firstButton, inputMode) {
 		}
 		Sleep(25)  ; Keep checking until timeout
 	}
-	; Did not press the start bitton within buttonTimer milliseconds
+	; The second button was not pressed within 'buttonTimer' milliseconds - so force the
+	; user to start from the beginning again.
 	Logger("Detect_Second_Input", "Timout waiting for second button in combo")
 	Sleep(500)
 }
@@ -252,7 +281,7 @@ Combo_Executed(controllerID, firstButton, inputMode) {
 	Logger("Combo_Executed", "Entering function")
 
 	; If EmulationStation is already running then we shouldn't
-	; do anything
+	; do anything (they could be mid-game!)
 	if (emulationStationPID > 0 && ProcessExist(emulationStationPID)) {
 		Logger("Combo_Executed", "EmulationStation still running (PID " emulationStationPID ") so returning")
 		return
@@ -407,6 +436,10 @@ Combo_Executed(controllerID, firstButton, inputMode) {
 	MouseMove(A_ScreenWidth, 0)
 
 	Logger("Combo_Executed", "All mouse clicks sent to EmulationStation")
+
+	; Finally, configure OnExit so that we can run any commands if someone
+	; attempts to shutdown Windows from EmulationStation
+	OnExit(OnExitHandler, 1)
 }
 
 ; Logger
@@ -456,28 +489,14 @@ Initialise() {
 		retrobatPath .= "\"
 	}
 
-	; In the latest release of RetroBat, the executable could be
-	; called "retrobat.exe" or "retrobat-new.exe", so we need to check
-	; for both in that order.
+	; Append the executable name
+	retrobatPath .= "retrobat.exe"
 
-	foundPath := ""
-
-	for exeName in ["retrobat-new.exe", "retrobat.exe"] {
-		pathToCheck := retrobatPath exeName
-		if (FileExist(pathToCheck)) {
-			foundPath := pathToCheck
-			break
-		}
-	}
-
-	; Since foundPath is blank, we cannot find either of the executable names
-	if (!foundPath) {
-		Msgbox("Unable to find retrobat-new.exe or retrobat.exe at " retrobatPath, "RetroBat Runner", 16)
+	; Check that retrobat.exe exists at that location
+	if (!FileExist(retrobatPath)) {
+		Msgbox("Unable to find RetroBat at " retrobatPath, "RetroBat Runner", 16)
 		ExitApp 1
 	}
-
-	; Set retrobatPath the path we found
-	retrobatPath := foundPath
 
 	; Configure system tray menu and set icon to RetroBat
 
