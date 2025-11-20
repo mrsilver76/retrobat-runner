@@ -18,38 +18,58 @@ _A program that runs in the system tray and automatically launches [RetroBat](ht
 
 ## 📦 Download
 
-* Get the latest version from [here](https://github.com/mrsilver76/retrobat-runner/releases).
-* Most people will want the file called `RetroBat_Runner.exe`.
+Get the latest version from https://github.com/mrsilver76/groupmachine/releases.
 
-## 🚀 Quick start guide
+There is no installer. Just download the executable and run it either by double-clicking or from the command line. 
 
-* Launch RetroBat Runner by double-clicking on it. The location of your installation of RetroBat will be automatically detected.
-* RetroBat Runner will appear in your System Tray with the RetroBat icon.
-* The launch combination is **SELECT/BACK** followed by **START** on any connected controller.
-* You must press the **START** button within 2 seconds of pressing the **SELECT/BACK** button.
-* If you press the combination correctly, all controllers will vibrate (if the controller supports this), a sound will be played and RetroBat will start.
-* If you do not press the combination correctly or you are too slow, then you will need to start the combination from the beginning again.
-* Pressing the combination whilst you are running RetroBat will do nothing.
-* To change various options, right-click on the RetroBat icon in the system tray.
+|Platform|Download|
+|:--------|:-----------|
+|Microsoft Windows 10 & 11|`RetroBat_Runner.exe` ✅ **Most users want this**|
+|Other/Developers|Source code (zip / tar.gz)|
+
+>[!WARNING]
+>RetroBat v7.3 to v7.5 renamed the main executable to `RetroBat-new.exe`. If you wish to using any of those versions,
+>you must download and use the older RetroBat Runner [v1.3.2](https://github.com/mrsilver76/retrobat-runner/releases/tag/1.3.2).
+
+## 🚀 Usage
+
+1. Launch RetroBat Runner by double-clicking `RetroBat_Runner.exe`.
+   - RetroBat’s installation location will be detected automatically.
+3. RetroBat Runner will appear in the system tray with the RetroBat icon.
+4. Launch RetroBat with your controller:
+   - Press **SELECT/BACK** and then **START** within 2 seconds on the same controller.
+   - Controllers will vibrate (if supported) and a sound will play when the combination is correct.
+   - RetroBat will start automatically.
+   - If the combination is incorrect or too slow, you must start over.
+   - Triggering the combination while RetroBat is running does nothing.
+5. To configure options, right-click the system tray icon to access:
+   - **Start with Windows** - Automatically start RetroBat Runner at login.
+   - **Command before launch** - Launch another program before RetroBat starts.
+   - **Command after exit** - Launch another program after RetroBat closes.
+   - **Visit RetroBat Runner website** - Open the GitHub page in your browser.
+   - **About RetroBat Runner** - View version info and credits.
 
 > [!TIP]
-> You must use the same controller to complete the combination. You cannot press **SELECT/BACK** on one controller and **START** on a different controller.
+> The same controller must be used to press both buttons. You cannot press **SELECT/BACK** on one controller and **START** on a different controller.
 
-## Installation instructions
+## ⚙️ Installation
 
-The easiest approach is to store the executable somewhere on your computer (for example, "My Documents"), run the executable, right click on the icon in your system tray and click on "Start with Windows" so that it is checked.
-
-The next time the current user logs into Windows (which will normally be when the computer powers on), RetroBat Runner will automatically start and sit in the System Tray.
-
-To stop it starting with Windows, repeat the process again so that "Start with Windows" is unchecked.
-
-To uninstall, delete the executable. There are no other files.
+- Place `RetroBat_Runner.exe` anywhere on your PC (e.g., "Documents").
+  - Advanced users may wish to use `%LOCALAPPDATA%\Programs\RetroBat Runner`
+- Run it once, then right-click the system tray icon and select "Start with Windows" to enable auto-start.
+- To disable, uncheck the same menu item.
+- To uninstall, simply delete the executable; no other files are created.
+  - Although not essential, you might want to disable "Start with Windows" before deleting.
 
 ## 💻 Source code / developers
 
-If you want to view or edit the source code (`RetroBat_Runner.ahk`) then you can use any text editor. I recommend [Notepad++](https://notepad-plus-plus.org/) or [Visual Studio Code](https://code.visualstudio.com/), but the built-in Notepad will do. The code needs the XInput library (`XInput.ahk`) to run, so don't delete this file. To run or compile the code, you will need [AutoHotkey v2](https://www.autohotkey.com/) installed.
+- RetroBat Runner was written using [AutoHotKey v2](https://www.autohotkey.com/). Do not use v1 as it is deprecated.
+- You can view the source code (`RetroBat_Runner.ahk`) in any text editor - such as Notepad or [Visual Studio Code](https://code.visualstudio.com/).
+- XInput controllers are handled by `XInput.ahk`. Do not delete this file otherwise RetroBat Runner will not run.
 
-There are two command line options available:
+### Command line options
+
+There are two command line options that are useful for developers:
 
 - **`/debug`**   
   Writes out a debug file to the same location and with the same name as the executable followed by `.log` (e.g. `RetroBat_Runner.exe.log`). This log contains additional information that can be useful when trying to resolve issues. Any existing log file will be overwritten.
@@ -71,6 +91,11 @@ RetroBat Runner currently meets the needs it was designed for, and no major new 
 - RetroBat is copyright &copy; Adrien Chalard and the RetroBat Team. For more details visit the [website](https://www.retrobat.org/) or the [GitHub repository](https://github.com/RetroBat-Official). 
 
 ## 🕰️ Version history
+
+### 1.4.0 (20th November 2025)
+- Removed automatic preference for `RetroBat-new.exe` because RetroBat v7.5.1 no longer uses this executable and doesn’t delete it during upgrades, so RetroBat Runner can’t rely on it being the correct one.
+- If "shutdown" or "restart" is used within EmulationStation, RetroBat Runner will attempt to execute any configured "Command after exit" prior to closing.
+- Improved ReadMe documentation.
 
 ### 1.3.2 (22nd August 2025)
 - Added support for RetroBat v7.3 by launching `RetroBat-new.exe` when the button combo is pressed. Older versions using `RetroBat.exe` are still supported.
