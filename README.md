@@ -46,6 +46,7 @@ There is no installer. Just download the executable and run it either by double-
    - **Start with Windows** - Automatically start RetroBat Runner at login.
    - **Command before launch** - Launch another program before RetroBat starts. ⚠️ See note below
    - **Command after exit** - Launch another program after RetroBat closes. ⚠️ See note below
+   - **Open EmulationStation events** - Open the EmulationStation events folder. ⚠️ See note below
    - **Visit RetroBat Runner website** - Open the GitHub page in your browser.
    - **About RetroBat Runner** - View version info and credits.
 
@@ -119,6 +120,7 @@ RetroBat Runner currently meets the needs it was designed for, and no major new 
 
 ### 1.4.1 (xx December 2025)
 - "Command after exit" no longer runs when using EmulationStation’s "shutdown" or "restart" options. Windows does not allow enough time for commands to run reliably; use EmulationStation’s own built-in event system for scripts triggered on shutdown or restart.
+- Added new menu item "Open EmulationStation events" which opens Windows Explorer with the location to place scripts/shortcuts/programs for triggering.
 - Updated documentation to explain how to use EmulationStation's event system.
 - Fixed a bug where video intros 5 seconds or longer would incorrectly trigger a pop-up claiming that EmulationStation did not appear to be launching.
 
