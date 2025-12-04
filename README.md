@@ -125,7 +125,8 @@ RetroBat Runner currently meets the needs it was designed for, and no major new 
 - Added new menu item "Open RetroBat Runner events" and moved "Command before launch" and "Command after exit" into a sub-menu.
 - Updated the copy on the pop-up for RetroBat Runner events to make clear that these will only run if EmulationStation was launched by RetroBat Runner.
 - Updated documentation to explain how to use EmulationStation's event system.
-- Fixed a bug where video intros 5 seconds or longer would incorrectly trigger a pop-up claiming that EmulationStation did not appear to be launching.
+- Fixed a bug where video intros over 5 second long would incorrectly trigger a pop-up claiming that EmulationStation did not appear to be launching.
+- Fixed a bug where buffered controller presses could mean the video intro is inadvertently skipped before it starts.
 
 ### 1.4.0 (20th November 2025)
 - Removed automatic preference for `RetroBat-new.exe` because RetroBat v7.5.1 no longer uses this executable and doesn’t delete it during upgrades, so RetroBat Runner can’t rely on it being the correct one.
