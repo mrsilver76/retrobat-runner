@@ -119,8 +119,8 @@ RetroBat Runner currently meets the needs it was designed for, and no major new 
 
 ## 🕰️ Version history
 
-### 1.5.0 (xx December 2025)
-- "Command after exit" no longer runs when using EmulationStation’s "shutdown" or "restart" options. Windows does not allow enough time for commands to run reliably; use EmulationStation’s own built-in event system for scripts triggered on shutdown or restart.
+### 1.5.0 (16 December 2025)
+- "Command after exit" no longer runs when using EmulationStation's "shutdown" or "restart" options. Windows does not allow enough time for commands to run reliably; use EmulationStation’s own built-in event system for scripts triggered on shutdown or restart.
 - Added new menu item "Open EmulationStation events" which opens Windows Explorer with the location to place scripts/shortcuts/programs for triggering.
 - Added new menu item "Open RetroBat Runner events" and moved "Command before launch" and "Command after exit" into a sub-menu.
 - Updated the copy on the pop-up for RetroBat Runner events to make clear that these will only run if EmulationStation was launched by RetroBat Runner.
@@ -129,6 +129,7 @@ RetroBat Runner currently meets the needs it was designed for, and no major new 
 - Fixed a bug where buffered controller presses could mean the video intro is inadvertently skipped before it starts.
 - Applied a workaround to correct XInput controllers occasionally being treated as DirectInput, which would stop vibration from working.
 - Tray menu cleaned up and reordered.
+- Some code tidied up (mainly function naming and global declarations)
 
 ### 1.4.0 (20th November 2025)
 - Removed automatic preference for `RetroBat-new.exe` because RetroBat v7.5.1 no longer uses this executable and doesn’t delete it during upgrades, so RetroBat Runner can’t rely on it being the correct one.
