@@ -44,13 +44,40 @@ There is no installer. Just download the executable and run it either by double-
    - Triggering the combination while RetroBat is running does nothing.
 5. To configure options, right-click the system tray icon to access:
    - **Start with Windows** - Automatically start RetroBat Runner at login.
-   - **Command before launch** - Launch another program before RetroBat starts.
-   - **Command after exit** - Launch another program after RetroBat closes.
+   - **RetroBat Runner events** - Opens a submenu for you to configure triggers on events.
+     - **Command before launch** - Launch another program before RetroBat starts. ⚠️ See [this section](#executing-commands-before-and-after-launch-or-exit) below
+     - **Command after exit** - Launch another program after RetroBat closes. ⚠️ See [this section](#executing-commands-before-and-after-launch-or-exit) below
+   - **EmulationStation events** - Open the EmulationStation events folder. ⚠️ See [this section](#executing-commands-before-and-after-launch-or-exit) below
    - **Visit RetroBat Runner website** - Open the GitHub page in your browser.
    - **About RetroBat Runner** - View version info and credits.
 
 > [!TIP]
 > The same controller must be used to press both buttons. You cannot press **SELECT/BACK** on one controller and **START** on a different controller.
+
+### Executing commands before and after launch or exit
+
+EmulationStation includes its own event system. You can place programs, shortcuts or scripts in specific folders inside your RetroBat installation and EmulationStation will run whatever is inside these folders whenever the matching event occurs. These events run every time EmulationStation starts, stops or changes state. It does not matter whether you opened RetroBat directly or launched it through RetroBat Runner.
+
+Use RetroBat Runner’s "command before launch" and "command after exit" when you want a script to run at the moment RetroBat is launched or closed **but only when it was started through the controller button combination.** These commands do not run if you open RetroBat in any other way.
+
+Assuming you install to the default location, then the event folders are inside `C:\RetroBat\emulationstation\.emulationstation\scripts`:
+
+| Subfolder name     | When it runs                                |
+| :----------------- | :------------------------------------------ |
+| `game-end`         | When a game ends                            |
+| `game-start`       | When a game starts                          |
+| `quit`             | When EmulationStation quits normally        |
+| `reboot`           | When EmulationStation reboots the system    |
+| `shutdown`         | When EmulationStation shuts down the system |
+| `sleep`            | When the system enters sleep                |
+| `start`            | When EmulationStation starts                |
+| `update-gamelists` | When gamelists are updated                  |
+| `wake`             | When the system wakes from sleep            |
+
+>[!NOTE]
+>- Scripts here run independently of RetroBat Runner.
+>- RetroBat Runner settings run only when RetroBat is launched via the controller combination.
+>- Avoid putting the same script in both places unless you want it to fire twice.
 
 ## ⚙️ Installation
 
@@ -91,6 +118,18 @@ RetroBat Runner currently meets the needs it was designed for, and no major new 
 - RetroBat is copyright &copy; Adrien Chalard and the RetroBat Team. For more details visit the [website](https://www.retrobat.org/) or the [GitHub repository](https://github.com/RetroBat-Official). 
 
 ## 🕰️ Version history
+
+### 1.5.0 (16 December 2025)
+- "Command after exit" no longer runs when using EmulationStation's "shutdown" or "restart" options. Windows does not allow enough time for commands to run reliably; use EmulationStation’s own built-in event system for scripts triggered on shutdown or restart.
+- Added new menu item "Open EmulationStation events" which opens Windows Explorer with the location to place scripts/shortcuts/programs for triggering.
+- Added new menu item "Open RetroBat Runner events" and moved "Command before launch" and "Command after exit" into a sub-menu.
+- Updated the copy on the pop-up for RetroBat Runner events to make clear that these will only run if EmulationStation was launched by RetroBat Runner.
+- Updated documentation to explain how to use EmulationStation's event system.
+- Fixed a bug where video intros over 5 second long would incorrectly trigger a pop-up claiming that EmulationStation did not appear to be launching.
+- Fixed a bug where buffered controller presses could mean the video intro is inadvertently skipped before it starts.
+- Applied a workaround to correct XInput controllers occasionally being treated as DirectInput, which would stop vibration from working.
+- Tray menu cleaned up and reordered.
+- Some code tidied up (mainly function naming and global declarations)
 
 ### 1.4.0 (20th November 2025)
 - Removed automatic preference for `RetroBat-new.exe` because RetroBat v7.5.1 no longer uses this executable and doesn’t delete it during upgrades, so RetroBat Runner can’t rely on it being the correct one.
