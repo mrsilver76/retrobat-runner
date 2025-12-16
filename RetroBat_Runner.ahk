@@ -4,7 +4,7 @@
 #Warn
 
 ;
-; RetroBat Runner v1.5.0 (16 December 2025)
+; RetroBat Runner v1.5.0 (16th December 2025)
 ; Automatically launch RetroBat when a specific button combination is
 ; pressed on any connected controller
 ; https://github.com/silver76/retrobat-runner/
@@ -146,7 +146,7 @@ Run_Execute_After() {
 		cmd := RegRead("HKEY_CURRENT_USER\Software\RetroBat Runner", "ExecuteAfter")
 		if (cmd) {
 			Logger("Check_ES_Status", "Executing after command: " cmd)
-			Run(cmd, , , &pid)  ; Don't wait for this to finish
+			Run(cmd)  ; Don't wait for this to finish
 		}
 	}
 }
@@ -239,7 +239,7 @@ Detect_Second_Input(controllerID, firstButton, inputMode) {
 }
 
 ; Wait_For_Release
-; Waits for the specific controller to no longer be pressing any buttons
+; Waits for the specific controller (defined by controllerID) to be no longer pressing any buttons
 Wait_For_Release(controllerID, inputMode) {
     Logger("Wait_For_Release", "Entering function")
 
