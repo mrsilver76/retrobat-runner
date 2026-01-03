@@ -1,5 +1,7 @@
 # RetroBat Runner
 
+<p><img src="https://img.shields.io/badge/Windows-supported-0078D6?logo=windows&logoColor=white" alt="Windows"> <img src="https://img.shields.io/badge/AutoHotkey-v2-1E9E00?logo=autohotkey&logoColor=white" alt="AutoHotkey v2"> <img src="https://img.shields.io/github/license/mrsilver76/retrobat-runner?logo=gnu&logoColor=white" alt="GPL License"></p>
+
 _A program that runs in the system tray and automatically launches [RetroBat](https://www.retrobat.org/) when a specific button combination is pressed on any connected controller. This is useful for people who don't want to run RetroBat permanently on a computer and want an easy way to start it without using the keyboard or mouse._
 
 ## 🧰 Features
